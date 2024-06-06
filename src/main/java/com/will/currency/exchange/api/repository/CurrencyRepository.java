@@ -6,12 +6,18 @@ import com.will.currency.exchange.api.util.ConnectionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CurrencyRepository implements Repository<Currency> {
 
     private final String SAVE_SQL = """
             INSERT INTO Currency(full_name, code, sign)
             VALUES(?, ?, ?);
+            """;
+    private final String FIND_ONE_SQL = """
+            SELECT id, full_name, code, sign
+            FROM Currency
+            WHERE code = ?;
             """;
     private final String FIND_ALL_SQL = """
             SELECT id, full_name, code, sign
@@ -41,12 +47,26 @@ public class CurrencyRepository implements Repository<Currency> {
         }
     }
 
+    public Optional<Currency> findOne(String code) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_ONE_SQL)) {
+            preparedStatement.setString(1, code);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Currency currency = null;
+            if (resultSet.next()) {
+                currency = buildCurrency(resultSet);
+            }
+            return Optional.ofNullable(currency);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<Currency> findAll() {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Currency> currencies = new ArrayList<>();
-
             while (resultSet.next()) {
                 Currency currency = buildCurrency(resultSet);
                 currencies.add(currency);
