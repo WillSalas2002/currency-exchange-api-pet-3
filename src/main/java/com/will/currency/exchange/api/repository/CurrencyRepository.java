@@ -17,6 +17,15 @@ public class CurrencyRepository implements Repository<Currency> {
             SELECT id, full_name, code, sign
             FROM Currency;
             """;
+    private final String UPDATE_SQL = """
+            UPDATE Currency
+            SET full_name = ?, code = ?, sign = ?
+            WHERE id = ?;
+            """;
+    private final String DELETE_SQL = """
+            DELETE FROM Currency
+            WHERE id = ?;
+            """;
 
     @Override
     public Currency save(Currency currency) {
@@ -25,6 +34,7 @@ public class CurrencyRepository implements Repository<Currency> {
             preparedStatement.setString(1, currency.getFullName());
             preparedStatement.setString(2, currency.getCode());
             preparedStatement.setString(3, currency.getSign());
+            preparedStatement.executeUpdate();
             return currency;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -49,8 +59,18 @@ public class CurrencyRepository implements Repository<Currency> {
     }
 
     @Override
-    public Currency update(Currency updatedEntity) {
-        return null;
+    public Currency update(Currency updatedCurrency) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, updatedCurrency.getFullName());
+            preparedStatement.setString(2, updatedCurrency.getCode());
+            preparedStatement.setString(3, updatedCurrency.getSign());
+            preparedStatement.setInt(4, updatedCurrency.getId());
+            preparedStatement.executeUpdate();
+            return updatedCurrency;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
