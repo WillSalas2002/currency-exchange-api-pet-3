@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CurrencyRepository implements Repository<Currency> {
+public class CurrencyRepository {
 
     private final String SAVE_SQL = """
             INSERT INTO Currency(full_name, code, sign)
@@ -33,7 +33,6 @@ public class CurrencyRepository implements Repository<Currency> {
             WHERE id = ?;
             """;
 
-    @Override
     public Currency save(Currency currency) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -77,7 +76,6 @@ public class CurrencyRepository implements Repository<Currency> {
         }
     }
 
-    @Override
     public Currency update(Currency updatedCurrency) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -92,7 +90,6 @@ public class CurrencyRepository implements Repository<Currency> {
         }
     }
 
-    @Override
     public void delete(Currency currency) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_SQL)) {
