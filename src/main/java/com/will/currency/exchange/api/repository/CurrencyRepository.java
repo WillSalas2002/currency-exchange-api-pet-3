@@ -42,7 +42,6 @@ public class CurrencyRepository implements Repository<Currency> {
     }
 
     public List<Currency> findAll() {
-
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -74,8 +73,14 @@ public class CurrencyRepository implements Repository<Currency> {
     }
 
     @Override
-    public void delete(Currency entity) {
-
+    public void delete(Currency currency) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_SQL)) {
+            preparedStatement.setInt(1, currency.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Currency buildCurrency(ResultSet resultSet) throws SQLException {
