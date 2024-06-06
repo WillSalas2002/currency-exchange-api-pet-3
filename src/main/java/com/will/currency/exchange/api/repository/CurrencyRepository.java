@@ -40,6 +40,11 @@ public class CurrencyRepository {
             preparedStatement.setString(2, currency.getCode());
             preparedStatement.setString(3, currency.getSign());
             preparedStatement.executeUpdate();
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    currency.setId(generatedKeys.getInt(1));
+                }
+            }
             return currency;
         } catch (SQLException e) {
             throw new RuntimeException(e);
