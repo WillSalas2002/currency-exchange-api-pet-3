@@ -59,7 +59,7 @@ public class ExchangeRateRepository {
         }
     }
 
-    public Optional<ExchangeRate> findOne(String baseCurrencyCode, String targetCurrencyCode) {
+    public Optional<ExchangeRate> findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ONE_SQL)) {
             preparedStatement.setString(1, baseCurrencyCode);

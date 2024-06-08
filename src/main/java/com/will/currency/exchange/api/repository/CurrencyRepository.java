@@ -51,7 +51,7 @@ public class CurrencyRepository {
         }
     }
 
-    public Optional<Currency> findOne(String code) {
+    public Optional<Currency> findByCurrencyCode(String code) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ONE_SQL)) {
             preparedStatement.setString(1, code);
