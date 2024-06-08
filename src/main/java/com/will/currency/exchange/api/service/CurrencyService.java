@@ -1,5 +1,6 @@
 package com.will.currency.exchange.api.service;
 
+import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.response.CurrencyResponse;
 import com.will.currency.exchange.api.repository.CurrencyRepository;
 
@@ -12,11 +13,16 @@ public class CurrencyService {
     public List<CurrencyResponse> findAll() {
         return repository.findAll()
                 .stream()
-                .map(currency -> new CurrencyResponse(
-                        currency.getId(),
-                        currency.getFullName(),
-                        currency.getCode(),
-                        currency.getSign()))
+                .map(this::buildCurrencyResponse)
                 .collect(Collectors.toList());
+    }
+
+    private CurrencyResponse buildCurrencyResponse(Currency currency) {
+        return new CurrencyResponse(
+                currency.getId(),
+                currency.getFullName(),
+                currency.getCode(),
+                currency.getSign()
+        );
     }
 }
