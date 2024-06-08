@@ -29,8 +29,8 @@ public class CurrencyService {
     private CurrencyResponse buildCurrencyResponse(Currency currency) {
         return new CurrencyResponse(
                 currency.getId(),
-                currency.getFullName(),
                 currency.getCode(),
+                currency.getFullName(),
                 currency.getSign()
         );
     }
