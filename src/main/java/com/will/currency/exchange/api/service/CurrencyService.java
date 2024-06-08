@@ -5,6 +5,7 @@ import com.will.currency.exchange.api.response.CurrencyResponse;
 import com.will.currency.exchange.api.repository.CurrencyRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CurrencyService {
@@ -15,6 +16,14 @@ public class CurrencyService {
                 .stream()
                 .map(this::buildCurrencyResponse)
                 .collect(Collectors.toList());
+    }
+
+    public CurrencyResponse findByCurrencyCode(String currencyCode) {
+        Optional<Currency> currencyOptional = repository.findByCurrencyCode(currencyCode);
+        if (currencyOptional.isEmpty()) {
+            throw new RuntimeException("There is no Currency with this code.");
+        }
+        return buildCurrencyResponse(currencyOptional.get());
     }
 
     private CurrencyResponse buildCurrencyResponse(Currency currency) {
