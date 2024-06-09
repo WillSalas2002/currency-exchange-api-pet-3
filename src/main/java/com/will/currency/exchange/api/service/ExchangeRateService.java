@@ -1,10 +1,13 @@
 package com.will.currency.exchange.api.service;
 
+import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.model.ExchangeRate;
 import com.will.currency.exchange.api.repository.ExchangeRateRepository;
+import com.will.currency.exchange.api.response.CurrencyResponse;
 import com.will.currency.exchange.api.response.ExchangeRateResponse;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ExchangeRateService {
@@ -17,12 +20,45 @@ public class ExchangeRateService {
                 .collect(Collectors.toList());
     }
 
+    public ExchangeRateResponse save(ExchangeRateResponse exchangeRateResponse) {
+        ExchangeRate exchangeRate = convertToExchangeRate(exchangeRateResponse);
+        ExchangeRate savedExchangeRate = repository.save(exchangeRate);
+        return convertToExchangeRateResponse(savedExchangeRate);
+    }
+
+    private ExchangeRate convertToExchangeRate(ExchangeRateResponse exchangeRateResponse) {
+        return new ExchangeRate(
+                exchangeRateResponse.getId(),
+                convertToCurrency(exchangeRateResponse.getBaseCurrency()),
+                convertToCurrency(exchangeRateResponse.getTargetCurrency()),
+                exchangeRateResponse.getRate()
+        );
+    }
+
     public ExchangeRateResponse convertToExchangeRateResponse(ExchangeRate exchangeRate) {
         return new ExchangeRateResponse(
                 exchangeRate.getId(),
-                exchangeRate.getBaseCurrency(),
-                exchangeRate.getTargetCurrency(),
+                convertToCurrencyResponse(exchangeRate.getBaseCurrency()),
+                convertToCurrencyResponse(exchangeRate.getTargetCurrency()),
                 exchangeRate.getRate()
+        );
+    }
+
+    private CurrencyResponse convertToCurrencyResponse(Currency currency) {
+        return new CurrencyResponse(
+                currency.getId(),
+                currency.getCode(),
+                currency.getFullName(),
+                currency.getSign()
+        );
+    }
+
+    private Currency convertToCurrency(CurrencyResponse currencyResponse) {
+        return new Currency(
+                currencyResponse.getId(),
+                currencyResponse.getCode(),
+                currencyResponse.getFullName(),
+                currencyResponse.getSign()
         );
     }
 }

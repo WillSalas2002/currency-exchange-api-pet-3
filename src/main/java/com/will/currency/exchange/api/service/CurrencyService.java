@@ -14,7 +14,7 @@ public class CurrencyService {
     public List<CurrencyResponse> findAll() {
         return repository.findAll()
                 .stream()
-                .map(this::buildCurrencyResponse)
+                .map(this::convertToCurrencyResponse)
                 .collect(Collectors.toList());
     }
 
@@ -23,15 +23,30 @@ public class CurrencyService {
         if (currencyOptional.isEmpty()) {
             throw new RuntimeException("There is no Currency with this code.");
         }
-        return buildCurrencyResponse(currencyOptional.get());
+        return convertToCurrencyResponse(currencyOptional.get());
     }
 
-    private CurrencyResponse buildCurrencyResponse(Currency currency) {
+    public CurrencyResponse save(CurrencyResponse currencyResponse) {
+        Currency currency = convertToCurrency(currencyResponse);
+        Currency savedCurrency = repository.save(currency);
+        return convertToCurrencyResponse(savedCurrency);
+    }
+
+    private CurrencyResponse convertToCurrencyResponse(Currency currency) {
         return new CurrencyResponse(
                 currency.getId(),
                 currency.getCode(),
                 currency.getFullName(),
                 currency.getSign()
+        );
+    }
+
+    private Currency convertToCurrency(CurrencyResponse currencyResponse) {
+        return new Currency(
+                currencyResponse.getId(),
+                currencyResponse.getCode(),
+                currencyResponse.getFullName(),
+                currencyResponse.getSign()
         );
     }
 }
