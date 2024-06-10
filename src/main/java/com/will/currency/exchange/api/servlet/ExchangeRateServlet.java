@@ -1,6 +1,7 @@
 package com.will.currency.exchange.api.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.will.currency.exchange.api.response.ExchangeRateResponse;
 import com.will.currency.exchange.api.service.CurrencyService;
 import com.will.currency.exchange.api.service.ExchangeRateService;
 import jakarta.servlet.ServletException;
@@ -18,6 +19,14 @@ public class ExchangeRateServlet extends BaseServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+        String pathInfo = req.getPathInfo().replace("/", "");
+        String baseCurrencyCode = pathInfo.substring(0, 3).toUpperCase();
+        String targetCurrencyCode = pathInfo.substring(3).toUpperCase();
+
+        // TODO: need to add validation
+
+        ExchangeRateResponse exchangeRateResponse = exchangeRateService.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
+        objectMapper.writeValue(resp.getWriter(), exchangeRateResponse);
+
     }
 }
