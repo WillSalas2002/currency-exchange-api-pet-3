@@ -26,6 +26,14 @@ public class ExchangeRateService {
         return convertToExchangeRateResponse(savedExchangeRate);
     }
 
+    public ExchangeRateResponse findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
+        Optional<ExchangeRate> exchangeRateOptional = repository.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
+        if (exchangeRateOptional.isPresent()) {
+            return convertToExchangeRateResponse(exchangeRateOptional.get());
+        }
+        throw new RuntimeException("not found");
+    }
+
     private ExchangeRate convertToExchangeRate(ExchangeRateResponse exchangeRateResponse) {
         return new ExchangeRate(
                 exchangeRateResponse.getId(),
