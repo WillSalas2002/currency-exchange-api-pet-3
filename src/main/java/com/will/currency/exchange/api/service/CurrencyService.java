@@ -27,7 +27,7 @@ public class CurrencyService {
         return convertToCurrencyResponse(currencyOptional.get());
     }
 
-    public CurrencyResponse save(CurrencyResponse currencyResponse) {
+    public CurrencyResponse save(CurrencyResponse currencyResponse) throws SQLException {
         Currency currency = convertToCurrency(currencyResponse);
         Currency savedCurrency = repository.save(currency);
         return convertToCurrencyResponse(savedCurrency);

@@ -1,5 +1,6 @@
 package com.will.currency.exchange.api.repository;
 
+import com.will.currency.exchange.api.exception.DuplicateEntityException;
 import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.util.ConnectionManager;
 
@@ -33,7 +34,7 @@ public class CurrencyRepository {
             WHERE id = ?;
             """;
 
-    public Currency save(Currency currency) {
+    public Currency save(Currency currency) throws SQLException {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, currency.getFullName());
@@ -46,8 +47,11 @@ public class CurrencyRepository {
                 }
             }
             return currency;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException err) {
+            if (err.getErrorCode() == 19) {
+                throw new DuplicateEntityException("Currency with this code already exists", err);
+            }
+            throw new SQLException(err);
         }
     }
 
