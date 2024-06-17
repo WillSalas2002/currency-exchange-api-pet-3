@@ -1,5 +1,6 @@
 package com.will.currency.exchange.api.repository;
 
+import com.will.currency.exchange.api.exception.DuplicateEntityException;
 import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.model.ExchangeRate;
 import com.will.currency.exchange.api.util.ConnectionManager;
@@ -41,7 +42,7 @@ public class ExchangeRateRepository {
             WHERE id = ?;
             """;
 
-    public ExchangeRate save(ExchangeRate exchangeRate) {
+    public ExchangeRate save(ExchangeRate exchangeRate) throws SQLException {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setInt(1, exchangeRate.getBaseCurrency().getId());
@@ -54,8 +55,11 @@ public class ExchangeRateRepository {
                 }
             }
             return exchangeRate;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException err) {
+            if (err.getErrorCode() == 19) {
+                throw new DuplicateEntityException("Exchange Rate with these codes already exists", err);
+            }
+            throw new SQLException(err);
         }
     }
 
@@ -75,7 +79,7 @@ public class ExchangeRateRepository {
         }
     }
 
-    public List<ExchangeRate> findAll() {
+    public List<ExchangeRate> findAll() throws SQLException {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             List<ExchangeRate> exchangeRates = new ArrayList<>();
@@ -85,8 +89,6 @@ public class ExchangeRateRepository {
                 exchangeRates.add(exchangeRate);
             }
             return exchangeRates;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 

@@ -6,6 +6,7 @@ import com.will.currency.exchange.api.repository.ExchangeRateRepository;
 import com.will.currency.exchange.api.response.CurrencyResponse;
 import com.will.currency.exchange.api.response.ExchangeRateResponse;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,14 +14,14 @@ import java.util.stream.Collectors;
 public class ExchangeRateService {
     private final ExchangeRateRepository repository = new ExchangeRateRepository();
 
-    public List<ExchangeRateResponse> findAll() {
+    public List<ExchangeRateResponse> findAll() throws SQLException {
         return repository.findAll()
                 .stream()
                 .map(this::convertToExchangeRateResponse)
                 .collect(Collectors.toList());
     }
 
-    public ExchangeRateResponse save(ExchangeRateResponse exchangeRateResponse) {
+    public ExchangeRateResponse save(ExchangeRateResponse exchangeRateResponse) throws SQLException {
         ExchangeRate exchangeRate = convertToExchangeRate(exchangeRateResponse);
         ExchangeRate savedExchangeRate = repository.save(exchangeRate);
         return convertToExchangeRateResponse(savedExchangeRate);
