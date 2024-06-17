@@ -34,6 +34,12 @@ public class ExchangeRateService {
         throw new RuntimeException("not found");
     }
 
+    public ExchangeRateResponse update(ExchangeRateResponse exchangeRateResponse) {
+        ExchangeRate exchangeRate = convertToExchangeRate(exchangeRateResponse);
+        ExchangeRate updatedExchangeRate = repository.update(exchangeRate);
+        return convertToExchangeRateResponse(updatedExchangeRate);
+    }
+
     private ExchangeRate convertToExchangeRate(ExchangeRateResponse exchangeRateResponse) {
         return new ExchangeRate(
                 exchangeRateResponse.getId(),
