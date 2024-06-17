@@ -55,7 +55,7 @@ public class CurrencyRepository {
         }
     }
 
-    public Optional<Currency> findByCurrencyCode(String code) {
+    public Optional<Currency> findByCurrencyCode(String code) throws SQLException {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ONE_SQL)) {
             preparedStatement.setString(1, code);
@@ -65,8 +65,6 @@ public class CurrencyRepository {
                 currency = buildCurrency(resultSet);
             }
             return Optional.ofNullable(currency);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 

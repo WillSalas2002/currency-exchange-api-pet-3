@@ -1,5 +1,6 @@
 package com.will.currency.exchange.api.service;
 
+import com.will.currency.exchange.api.exception.NoSuchEntityException;
 import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.response.CurrencyResponse;
 import com.will.currency.exchange.api.repository.CurrencyRepository;
@@ -19,10 +20,10 @@ public class CurrencyService {
                 .collect(Collectors.toList());
     }
 
-    public CurrencyResponse findByCurrencyCode(String currencyCode) {
+    public CurrencyResponse findByCurrencyCode(String currencyCode) throws SQLException {
         Optional<Currency> currencyOptional = repository.findByCurrencyCode(currencyCode);
         if (currencyOptional.isEmpty()) {
-            throw new RuntimeException("There is no Currency with this code.");
+            throw new NoSuchEntityException("There is no Currency with this code");
         }
         return convertToCurrencyResponse(currencyOptional.get());
     }

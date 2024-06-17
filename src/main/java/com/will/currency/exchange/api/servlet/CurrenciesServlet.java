@@ -24,6 +24,7 @@ public class CurrenciesServlet extends BaseServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             List<CurrencyResponse> currencies = currencyService.findAll();
+            resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getWriter(), currencies);
         } catch (SQLException err) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
