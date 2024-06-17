@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS exchange_rate
     base_currency_id   INTEGER,
     target_currency_id INTEGER,
     rate               DECIMAL(8, 6),
+    CONSTRAINT uc_currencies UNIQUE (base_currency_id, target_currency_id),
     FOREIGN KEY (base_currency_id) REFERENCES currency (id) ON DELETE CASCADE,
     FOREIGN KEY (target_currency_id) REFERENCES currency (id) ON DELETE CASCADE
 );
