@@ -66,7 +66,7 @@ public class CurrencyRepository {
         }
     }
 
-    public List<Currency> findAll() {
+    public List<Currency> findAll() throws SQLException {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -76,8 +76,6 @@ public class CurrencyRepository {
                 currencies.add(currency);
             }
             return currencies;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 

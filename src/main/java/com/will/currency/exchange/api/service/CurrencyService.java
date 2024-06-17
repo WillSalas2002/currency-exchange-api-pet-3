@@ -4,6 +4,7 @@ import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.response.CurrencyResponse;
 import com.will.currency.exchange.api.repository.CurrencyRepository;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 public class CurrencyService {
     private final CurrencyRepository repository = new CurrencyRepository();
 
-    public List<CurrencyResponse> findAll() {
+    public List<CurrencyResponse> findAll() throws SQLException {
         return repository.findAll()
                 .stream()
                 .map(this::convertToCurrencyResponse)
