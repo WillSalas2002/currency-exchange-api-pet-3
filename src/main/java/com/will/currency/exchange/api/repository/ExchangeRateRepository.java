@@ -63,7 +63,7 @@ public class ExchangeRateRepository {
         }
     }
 
-    public Optional<ExchangeRate> findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
+    public Optional<ExchangeRate> findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) throws SQLException {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ONE_SQL)) {
             preparedStatement.setString(1, baseCurrencyCode);
@@ -74,8 +74,6 @@ public class ExchangeRateRepository {
                 exchangeRate = buildExchangeRate(resultSet);
             }
             return Optional.ofNullable(exchangeRate);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -92,15 +90,13 @@ public class ExchangeRateRepository {
         }
     }
 
-    public ExchangeRate update(ExchangeRate updatedExchangeRate) {
+    public ExchangeRate update(ExchangeRate updatedExchangeRate) throws SQLException {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setBigDecimal(1, updatedExchangeRate.getRate());
             preparedStatement.setInt(2, updatedExchangeRate.getId());
             preparedStatement.executeUpdate();
             return updatedExchangeRate;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 

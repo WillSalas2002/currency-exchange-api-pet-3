@@ -1,5 +1,6 @@
 package com.will.currency.exchange.api.service;
 
+import com.will.currency.exchange.api.exception.NoSuchEntityException;
 import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.model.ExchangeRate;
 import com.will.currency.exchange.api.repository.ExchangeRateRepository;
@@ -27,15 +28,15 @@ public class ExchangeRateService {
         return convertToExchangeRateResponse(savedExchangeRate);
     }
 
-    public ExchangeRateResponse findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
+    public ExchangeRateResponse findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) throws SQLException {
         Optional<ExchangeRate> exchangeRateOptional = repository.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
         if (exchangeRateOptional.isPresent()) {
             return convertToExchangeRateResponse(exchangeRateOptional.get());
         }
-        throw new RuntimeException("not found");
+        throw new NoSuchEntityException("Exchange rate with this codes not found");
     }
 
-    public ExchangeRateResponse update(ExchangeRateResponse exchangeRateResponse) {
+    public ExchangeRateResponse update(ExchangeRateResponse exchangeRateResponse) throws SQLException {
         ExchangeRate exchangeRate = convertToExchangeRate(exchangeRateResponse);
         ExchangeRate updatedExchangeRate = repository.update(exchangeRate);
         return convertToExchangeRateResponse(updatedExchangeRate);
