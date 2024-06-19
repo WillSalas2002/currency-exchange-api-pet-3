@@ -11,6 +11,7 @@ import com.will.currency.exchange.api.service.CurrencyService;
 import com.will.currency.exchange.api.service.ExchangeRateService;
 import com.will.currency.exchange.api.util.Validation;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -20,7 +21,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/exchangeRates")
-public class ExchangeRatesServlet extends BaseServlet {
+public class ExchangeRatesServlet extends HttpServlet {
 
     private final ExchangeRateService exchangeRateService = new ExchangeRateService();
     private final CurrencyService currencyService = new CurrencyService();

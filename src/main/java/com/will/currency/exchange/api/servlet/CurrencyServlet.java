@@ -7,6 +7,7 @@ import com.will.currency.exchange.api.response.ErrorResponse;
 import com.will.currency.exchange.api.service.CurrencyService;
 import com.will.currency.exchange.api.util.Validation;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -14,7 +15,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet("/currency/*")
-public class CurrencyServlet extends BaseServlet {
+public class CurrencyServlet extends HttpServlet {
     private final CurrencyService currencyService = new CurrencyService();
     private final ObjectMapper objectMapper = new ObjectMapper();
 

@@ -9,6 +9,7 @@ import com.will.currency.exchange.api.service.ExchangeRateService;
 import com.will.currency.exchange.api.util.Validation;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -19,7 +20,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 @WebServlet("/exchangeRate/*")
-public class ExchangeRateServlet extends BaseServlet {
+public class ExchangeRateServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService = new ExchangeRateService();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
