@@ -80,7 +80,7 @@ public class ExchangeRateServlet extends HttpServlet {
                 throw new InvalidParameterException("Invalid [rate] entered");
             }
             BigDecimal rate = new BigDecimal(rateOptional.get());
-            ExchangeRateResponse exchangeRate = exchangeRateService.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
+            ExchangeRateResponse exchangeRate = exchangeRateService.findByCurrencyCodes(baseCurrencyCode.toUpperCase(), targetCurrencyCode.toUpperCase());
             exchangeRate.setRate(rate);
             ExchangeRateResponse updatedExchangeRate = exchangeRateService.update(exchangeRate);
             resp.setStatus(HttpServletResponse.SC_OK);
