@@ -1,54 +1,31 @@
 package com.will.currency.exchange.api.service;
 
 import com.will.currency.exchange.api.exception.NoSuchEntityException;
+import com.will.currency.exchange.api.mapper.CurrencyMapper;
 import com.will.currency.exchange.api.model.Currency;
-import com.will.currency.exchange.api.response.CurrencyResponse;
 import com.will.currency.exchange.api.repository.CurrencyRepository;
+import com.will.currency.exchange.api.response.CurrencyResponse;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CurrencyService {
     private final CurrencyRepository repository = new CurrencyRepository();
+    private final CurrencyMapper currencyMapper = CurrencyMapper.INSTANCE;
 
     public List<CurrencyResponse> findAll() throws SQLException {
-        return repository.findAll()
-                .stream()
-                .map(this::convertToCurrencyResponse)
-                .collect(Collectors.toList());
+        return currencyMapper.toResponseList(repository.findAll());
     }
 
     public CurrencyResponse findByCurrencyCode(String currencyCode) throws SQLException {
-        Optional<Currency> currencyOptional = repository.findByCurrencyCode(currencyCode);
-        if (currencyOptional.isEmpty()) {
-            throw new NoSuchEntityException("There is no Currency with this code");
-        }
-        return convertToCurrencyResponse(currencyOptional.get());
+        return repository.findByCurrencyCode(currencyCode)
+                .map(currencyMapper::toResponse)
+                .orElseThrow(() -> new NoSuchEntityException("There is no Currency with this code"));
     }
 
     public CurrencyResponse save(CurrencyResponse currencyResponse) throws SQLException {
-        Currency currency = convertToCurrency(currencyResponse);
+        Currency currency = currencyMapper.toEntity(currencyResponse);
         Currency savedCurrency = repository.save(currency);
-        return convertToCurrencyResponse(savedCurrency);
-    }
-
-    private CurrencyResponse convertToCurrencyResponse(Currency currency) {
-        return new CurrencyResponse(
-                currency.getId(),
-                currency.getCode(),
-                currency.getFullName(),
-                currency.getSign()
-        );
-    }
-
-    private Currency convertToCurrency(CurrencyResponse currencyResponse) {
-        return new Currency(
-                currencyResponse.getId(),
-                currencyResponse.getCode(),
-                currencyResponse.getFullName(),
-                currencyResponse.getSign()
-        );
+        return currencyMapper.toResponse(savedCurrency);
     }
 }
