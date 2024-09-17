@@ -4,7 +4,11 @@ import com.will.currency.exchange.api.exception.DuplicateEntityException;
 import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.util.ConnectionManager;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

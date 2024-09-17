@@ -3,6 +3,7 @@ package com.will.currency.exchange.api.response;
 import lombok.*;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString
