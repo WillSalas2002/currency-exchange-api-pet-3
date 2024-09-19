@@ -45,7 +45,7 @@ public class ExchangeServlet extends HttpServlet {
             Optional<ExchangeResponse> exchangeOptional = exchangeService.exchange(baseCurrency, targetCurrency, amount);
             if (exchangeOptional.isPresent()) {
                 resp.setStatus(HttpServletResponse.SC_OK);
-                objectMapper.writeValue(resp.getWriter(), exchangeOptional);
+                objectMapper.writeValue(resp.getWriter(), exchangeOptional.get());
             } else {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 objectMapper.writeValue(resp.getWriter(), new ErrorResponse("Couldn't convert"));
