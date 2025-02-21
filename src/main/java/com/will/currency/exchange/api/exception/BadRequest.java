@@ -3,9 +3,10 @@ package com.will.currency.exchange.api.exception;
 import lombok.Getter;
 
 @Getter
-public class InvalidParameterException extends RuntimeException {
+public class BadRequest extends RuntimeException {
     private final String message;
-    public InvalidParameterException(String message) {
+
+    public BadRequest(String message) {
         super(message);
         this.message = message;
     }

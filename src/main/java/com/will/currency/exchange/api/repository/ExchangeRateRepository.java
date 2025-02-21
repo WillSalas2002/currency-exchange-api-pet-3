@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ExchangeRateRepository {
+    public static final String MESSAGE_UNIQUE_CONSTRAINT_VIOLATION = "Exchange Rate with these codes already exists";
     private final String SAVE_SQL = """
             INSERT INTO exchange_rate(base_currency_id, target_currency_id, rate)
             VALUES(?, ?, ?);
@@ -41,10 +42,6 @@ public class ExchangeRateRepository {
             SET rate = ?
             WHERE id = ?;
             """;
-    private final String DELETE_SQL = """
-            DELETE FROM exchange_rate
-            WHERE id = ?;
-            """;
 
     public ExchangeRate save(ExchangeRate exchangeRate) throws SQLException {
         try (Connection connection = ConnectionManager.get();
@@ -61,7 +58,7 @@ public class ExchangeRateRepository {
             return exchangeRate;
         } catch (SQLException err) {
             if (err.getErrorCode() == 19) {
-                throw new DuplicateEntityException("Exchange Rate with these codes already exists", err);
+                throw new DuplicateEntityException(MESSAGE_UNIQUE_CONSTRAINT_VIOLATION, err);
             }
             throw new SQLException(err);
         }
@@ -101,16 +98,6 @@ public class ExchangeRateRepository {
             preparedStatement.setInt(2, updatedExchangeRate.getId());
             preparedStatement.executeUpdate();
             return updatedExchangeRate;
-        }
-    }
-
-    public void delete(ExchangeRate exchangeRate) {
-        try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_SQL)) {
-            preparedStatement.setInt(1, exchangeRate.getId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 

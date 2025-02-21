@@ -17,8 +17,4 @@ public class Validation {
     public static boolean isValidRate(String rate) {
         return rate != null && rate.matches("^\\d+(\\.\\d+)?$");
     }
-
-    public static boolean isValidCurrency(String code, String fullName, String sign) {
-        return isValidCode(code) && isValidFullName(fullName) && isValidSign(sign);
-    }
 }

@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class CurrencyService {
+    private static final String MESSAGE_NOT_FOUND = "There is no Currency with this code";
+
     private final CurrencyRepository repository = new CurrencyRepository();
     private final CurrencyMapper currencyMapper = CurrencyMapper.INSTANCE;
 
@@ -20,7 +22,7 @@ public class CurrencyService {
     public CurrencyResponse findByCurrencyCode(String currencyCode) throws SQLException {
         return repository.findByCurrencyCode(currencyCode)
                 .map(currencyMapper::toResponse)
-                .orElseThrow(() -> new NoSuchEntityException("There is no Currency with this code"));
+                .orElseThrow(() -> new NoSuchEntityException(MESSAGE_NOT_FOUND));
     }
 
     public CurrencyResponse save(CurrencyResponse currencyResponse) throws SQLException {

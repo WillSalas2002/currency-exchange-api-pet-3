@@ -2,7 +2,6 @@ package com.will.currency.exchange.api.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.will.currency.exchange.api.exception.DuplicateEntityException;
-import com.will.currency.exchange.api.exception.InvalidParameterException;
 import com.will.currency.exchange.api.exception.NoSuchEntityException;
 import com.will.currency.exchange.api.response.CurrencyResponse;
 import com.will.currency.exchange.api.response.ErrorResponse;
@@ -22,36 +21,41 @@ import java.util.List;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
+    private static final String PARAM_RATE = "rate";
+    private static final String PARAM_BASE_CURRENCY_CODE = "baseCurrencyCode";
+    private static final String PARAM_TARGET_CURRENCY_CODE = "targetCurrencyCode";
+    private static final String MESSAGE_INVALID_PARAM = "Invalid parameter: %s";
+    private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
 
-    private final ExchangeRateService exchangeRateService = new ExchangeRateService();
-    private final CurrencyService currencyService = new CurrencyService();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final CurrencyService currencyService = new CurrencyService();
+    private final ExchangeRateService exchangeRateService = new ExchangeRateService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             List<ExchangeRateResponse> exchangeRates = exchangeRateService.findAll();
+            resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getWriter(), exchangeRates);
         } catch (SQLException err) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            objectMapper.writeValue(resp.getWriter(), new ErrorResponse("Database is not available"));
+            sendErrorResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, MESSAGE_INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String baseCurrencyCode = req.getParameter("baseCurrencyCode");
-        String targetCurrencyCode = req.getParameter("targetCurrencyCode");
-        String rateStr = req.getParameter("rate");
+        String baseCurrencyCode = req.getParameter(PARAM_BASE_CURRENCY_CODE);
+        String targetCurrencyCode = req.getParameter(PARAM_TARGET_CURRENCY_CODE);
+        String rateStr = req.getParameter(PARAM_RATE);
         try {
             if (!Validation.isValidCode(baseCurrencyCode)) {
-                throw new InvalidParameterException("Invalid [baseCurrencyCode] entered");
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, baseCurrencyCode));
             }
             if (!Validation.isValidCode(targetCurrencyCode)) {
-                throw new InvalidParameterException("Invalid [targetCurrencyCode] entered");
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, targetCurrencyCode));
             }
             if (!Validation.isValidRate(rateStr)) {
-                throw new InvalidParameterException("Invalid [rate] entered");
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, rateStr));
             }
             baseCurrencyCode = baseCurrencyCode.toUpperCase();
             targetCurrencyCode = targetCurrencyCode.toUpperCase();
@@ -65,18 +69,17 @@ public class ExchangeRatesServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getWriter(), savedExchangeRate);
 
-        } catch (InvalidParameterException err) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            objectMapper.writeValue(resp.getWriter(), new ErrorResponse(err.getMessage()));
         } catch (NoSuchEntityException err) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            objectMapper.writeValue(resp.getWriter(), new ErrorResponse(err.getMessage()));
+            sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, err.getMessage());
         } catch (DuplicateEntityException err) {
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
-            objectMapper.writeValue(resp.getWriter(), new ErrorResponse(err.getMessage()));
+            sendErrorResponse(resp, HttpServletResponse.SC_CONFLICT, err.getMessage());
         } catch (SQLException err) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            objectMapper.writeValue(resp.getWriter(), new ErrorResponse("Database is not available"));
+            sendErrorResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, MESSAGE_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private void sendErrorResponse(HttpServletResponse resp, int statusCode, String err) throws IOException {
+        resp.setStatus(statusCode);
+        objectMapper.writeValue(resp.getWriter(), new ErrorResponse(err));
     }
 }

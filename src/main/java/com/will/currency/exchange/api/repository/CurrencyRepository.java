@@ -28,15 +28,6 @@ public class CurrencyRepository {
             SELECT id, full_name, code, sign
             FROM Currency;
             """;
-    private final String UPDATE_SQL = """
-            UPDATE Currency
-            SET full_name = ?, code = ?, sign = ?
-            WHERE id = ?;
-            """;
-    private final String DELETE_SQL = """
-            DELETE FROM Currency
-            WHERE id = ?;
-            """;
 
     public Currency save(Currency currency) throws SQLException {
         try (Connection connection = ConnectionManager.get();
@@ -82,30 +73,6 @@ public class CurrencyRepository {
                 currencies.add(currency);
             }
             return currencies;
-        }
-    }
-
-    public Currency update(Currency updatedCurrency) {
-        try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
-            preparedStatement.setString(1, updatedCurrency.getFullName());
-            preparedStatement.setString(2, updatedCurrency.getCode());
-            preparedStatement.setString(3, updatedCurrency.getSign());
-            preparedStatement.setInt(4, updatedCurrency.getId());
-            preparedStatement.executeUpdate();
-            return updatedCurrency;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void delete(Currency currency) {
-        try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_SQL)) {
-            preparedStatement.setInt(1, currency.getId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 

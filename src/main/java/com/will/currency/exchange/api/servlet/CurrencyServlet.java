@@ -16,26 +16,32 @@ import java.sql.SQLException;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
+    private static final String SYMBOL_FRONT_SLASH = "/";
+    private static final String MESSAGE_INVALID_PARAMETER = "Invalid parameter: %s";
+    private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
+
     private final CurrencyService currencyService = new CurrencyService();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String currencyCode = req.getPathInfo().replace("/", "");
+        String currencyCode = req.getPathInfo().replace(SYMBOL_FRONT_SLASH, "");
         if (!Validation.isValidCode(currencyCode)) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            objectMapper.writeValue(resp.getWriter(), new ErrorResponse("Invalid [code] entered"));
+            sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, MESSAGE_INVALID_PARAMETER);
         }
         try {
             CurrencyResponse currencyResponse = currencyService.findByCurrencyCode(currencyCode.toUpperCase());
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getWriter(), currencyResponse);
         } catch (NoSuchEntityException err) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            objectMapper.writeValue(resp.getWriter(), new ErrorResponse(err.getMessage()));
+            sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, err.getMessage());
         } catch (SQLException err) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            objectMapper.writeValue(resp.getWriter(), new ErrorResponse("Database is not available"));
+            sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, MESSAGE_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private void sendErrorResponse(HttpServletResponse resp, int statusCode, String errorMessage) throws IOException {
+        resp.setStatus(statusCode);
+        objectMapper.writeValue(resp.getWriter(), new ErrorResponse(errorMessage));
     }
 }

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ExchangeRateService {
+    private static final String MESSAGE_NOT_FOUND = "Exchange rate with this codes not found";
     private final ExchangeRateRepository repository = new ExchangeRateRepository();
     private final ExchangeRateMapper exchangeRateMapper = ExchangeRateMapper.INSTANCE;
 
@@ -28,7 +29,7 @@ public class ExchangeRateService {
     public ExchangeRateResponse findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) throws SQLException {
         return repository.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode)
                 .map(exchangeRateMapper::toResponse)
-                .orElseThrow(() -> new NoSuchEntityException("Exchange rate with this codes not found"));
+                .orElseThrow(() -> new NoSuchEntityException(MESSAGE_NOT_FOUND));
     }
 
     public ExchangeRateResponse update(ExchangeRateResponse exchangeRateResponse) throws SQLException {

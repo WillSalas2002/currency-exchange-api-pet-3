@@ -2,8 +2,12 @@ package com.will.currency.exchange.api.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.sqlite.SQLiteConnection;
 
+import java.io.File;
 import java.lang.reflect.Proxy;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -47,9 +51,15 @@ public final class ConnectionManager {
     private static Connection open() {
         Connection connection;
         try {
+            URL resource = ConnectionManager.class.getClassLoader().getResource("db.sqlite");
+            if (resource == null) {
+                throw new RuntimeException("Database file not found in resources!");
+            }
+            String absolutePath = new File(resource.toURI()).getAbsolutePath();
+            String url = "jdbc:sqlite:" + absolutePath;
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection(PropertiesUtil.get(URL_KEY));
-        } catch (SQLException | ClassNotFoundException e) {
+            connection = DriverManager.getConnection(url);
+        } catch (SQLException | ClassNotFoundException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
         return connection;
