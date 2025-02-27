@@ -7,7 +7,7 @@ import com.will.currency.exchange.api.response.CurrencyDTO;
 import com.will.currency.exchange.api.response.ErrorDTO;
 import com.will.currency.exchange.api.response.ExchangeDTO;
 import com.will.currency.exchange.api.service.CurrencyService;
-import com.will.currency.exchange.api.service.ExchangeService;
+import com.will.currency.exchange.api.service.ExchangeStrategyService;
 import com.will.currency.exchange.api.util.Validation;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,7 +27,7 @@ public class ExchangeServlet extends HttpServlet {
     private static final String MESSAGE_INVALID_PARAMETER = "Invalid parameter: %s";
     private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
 
-    private final ExchangeService exchangeService = new ExchangeService();
+    private final ExchangeStrategyService exchangeService = new ExchangeStrategyService();
     private final CurrencyService currencyService = new CurrencyService();
     private final ObjectMapper objectMapper = new ObjectMapper();
 

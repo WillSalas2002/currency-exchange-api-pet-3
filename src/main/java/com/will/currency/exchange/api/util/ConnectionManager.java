@@ -2,7 +2,6 @@ package com.will.currency.exchange.api.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.sqlite.SQLiteConnection;
 
 import java.io.File;
 import java.lang.reflect.Proxy;
@@ -16,7 +15,6 @@ import java.util.concurrent.BlockingQueue;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConnectionManager {
-    private static final String URL_KEY = "db.url";
     private static final String POOL_KEY = "db.pool.key";
     private static final int DEFAULT_POOL_SIZE = 10;
     private static BlockingQueue<Connection> pool;

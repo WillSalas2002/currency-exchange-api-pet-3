@@ -1,0 +1,39 @@
+package com.will.currency.exchange.api.service;
+
+import com.will.currency.exchange.api.model.ExchangeRate;
+import com.will.currency.exchange.api.repository.ExchangeRateRepository;
+import com.will.currency.exchange.api.response.CurrencyDTO;
+import com.will.currency.exchange.api.response.ExchangeDTO;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.sql.SQLException;
+import java.util.Optional;
+
+import static com.will.currency.exchange.api.service.ExchangeRateFactory.buildExchangeRate;
+
+public class USDExchangeService extends ExchangeStrategy {
+
+    public USDExchangeService(ExchangeRateRepository exchangeRateRepository) {
+        super(exchangeRateRepository);
+    }
+
+    @Override
+    public Optional<ExchangeDTO> exchange(CurrencyDTO baseCurrency, CurrencyDTO targetCurrency, BigDecimal amount) throws SQLException {
+        final String USD_CODE = "USD";
+        Optional<ExchangeRate> baseToUsdRate = exchangeRateRepository.findByCurrencyCodes(USD_CODE, baseCurrency.getCode());
+        Optional<ExchangeRate> targetToUsdRate = exchangeRateRepository.findByCurrencyCodes(USD_CODE, targetCurrency.getCode());
+        if (baseToUsdRate.isPresent() && targetToUsdRate.isPresent()) {
+            ExchangeRate baseExchangeRate = baseToUsdRate.get();
+            ExchangeRate targetExchangeRate = targetToUsdRate.get();
+            ExchangeRate exchangeRate = prepareExchangeRate(targetExchangeRate, baseExchangeRate);
+            return Optional.of(calculateExchangeAmount(exchangeRate, amount));
+        }
+        return Optional.empty();
+    }
+
+    private static ExchangeRate prepareExchangeRate(ExchangeRate targetExchangeRate, ExchangeRate baseExchangeRate) {
+        BigDecimal rateWithUSDBase = targetExchangeRate.getRate().divide(baseExchangeRate.getRate(), 2, RoundingMode.HALF_EVEN);
+        return buildExchangeRate(baseExchangeRate.getBaseCurrency(), targetExchangeRate.getTargetCurrency(), rateWithUSDBase);
+    }
+}
