@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @AllArgsConstructor
 @Getter
-public class ExchangeResponse {
+public class ExchangeDTO {
     private Currency baseCurrency;
     private Currency targetCurrency;
     private BigDecimal rate;

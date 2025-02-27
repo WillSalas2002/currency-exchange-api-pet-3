@@ -1,10 +1,9 @@
 package com.will.currency.exchange.api.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.will.currency.exchange.api.exception.BadRequest;
 import com.will.currency.exchange.api.exception.NoSuchEntityException;
-import com.will.currency.exchange.api.response.ErrorResponse;
-import com.will.currency.exchange.api.response.ExchangeRateResponse;
+import com.will.currency.exchange.api.response.ErrorDTO;
+import com.will.currency.exchange.api.response.ExchangeRateDTO;
 import com.will.currency.exchange.api.service.ExchangeRateService;
 import com.will.currency.exchange.api.util.Validation;
 import jakarta.servlet.ServletException;
@@ -48,13 +47,15 @@ public class ExchangeRateServlet extends HttpServlet {
         try {
             if (!Validation.isValidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, baseCurrencyCode));
+                return;
             }
             if (!Validation.isValidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, targetCurrencyCode));
+                return;
             }
-            ExchangeRateResponse exchangeRateResponse = exchangeRateService.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
+            ExchangeRateDTO exchangeRateDTO = exchangeRateService.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
             resp.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(resp.getWriter(), exchangeRateResponse);
+            objectMapper.writeValue(resp.getWriter(), exchangeRateDTO);
 
         } catch (NoSuchEntityException err) {
             sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, err.getMessage());
@@ -71,17 +72,20 @@ public class ExchangeRateServlet extends HttpServlet {
         try {
             if (!Validation.isValidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, baseCurrencyCode);
+                return;
             }
             if (!Validation.isValidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, targetCurrencyCode);
+                return;
             }
             if (rateOptional.isEmpty() || !Validation.isValidRate(rateOptional.get())) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, rateOptional.get());
+                return;
             }
             BigDecimal rate = new BigDecimal(rateOptional.get());
-            ExchangeRateResponse exchangeRate = exchangeRateService.findByCurrencyCodes(baseCurrencyCode.toUpperCase(), targetCurrencyCode.toUpperCase());
+            ExchangeRateDTO exchangeRate = exchangeRateService.findByCurrencyCodes(baseCurrencyCode.toUpperCase(), targetCurrencyCode.toUpperCase());
             exchangeRate.setRate(rate);
-            ExchangeRateResponse updatedExchangeRate = exchangeRateService.update(exchangeRate);
+            ExchangeRateDTO updatedExchangeRate = exchangeRateService.update(exchangeRate);
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getWriter(), updatedExchangeRate);
         } catch (NoSuchEntityException err) {
@@ -93,7 +97,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
     private void sendErrorResponse(HttpServletResponse resp, int statusCode, String errorMessage) throws IOException {
         resp.setStatus(statusCode);
-        objectMapper.writeValue(resp.getWriter(), new ErrorResponse(errorMessage));
+        objectMapper.writeValue(resp.getWriter(), new ErrorDTO(errorMessage));
     }
 
     private Optional<String> getRateParameter(HttpServletRequest req) {

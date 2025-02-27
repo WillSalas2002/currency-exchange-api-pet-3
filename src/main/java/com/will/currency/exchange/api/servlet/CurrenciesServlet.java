@@ -3,8 +3,8 @@ package com.will.currency.exchange.api.servlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.will.currency.exchange.api.exception.BadRequest;
 import com.will.currency.exchange.api.exception.DuplicateEntityException;
-import com.will.currency.exchange.api.response.CurrencyResponse;
-import com.will.currency.exchange.api.response.ErrorResponse;
+import com.will.currency.exchange.api.response.CurrencyDTO;
+import com.will.currency.exchange.api.response.ErrorDTO;
 import com.will.currency.exchange.api.service.CurrencyService;
 import com.will.currency.exchange.api.util.Validation;
 import jakarta.servlet.annotation.WebServlet;
@@ -30,7 +30,7 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            List<CurrencyResponse> currencies = currencyService.findAll();
+            List<CurrencyDTO> currencies = currencyService.findAll();
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getWriter(), currencies);
         } catch (SQLException err) {
@@ -46,17 +46,20 @@ public class CurrenciesServlet extends HttpServlet {
         try {
             if (!Validation.isValidFullName(fullName)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, fullName));
+                return;
             }
             if (!Validation.isValidCode(code)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, code));
+                return;
             }
             if (!Validation.isValidSign(sign)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, sign));
+                return;
             }
-            CurrencyResponse currency = new CurrencyResponse(code.toUpperCase(), fullName, sign);
-            CurrencyResponse currencyResponse = currencyService.save(currency);
+            CurrencyDTO currency = new CurrencyDTO(code.toUpperCase(), fullName, sign);
+            CurrencyDTO currencyDTO = currencyService.save(currency);
             resp.setStatus(HttpServletResponse.SC_OK);
-            objectMapper.writeValue(resp.getWriter(), currencyResponse);
+            objectMapper.writeValue(resp.getWriter(), currencyDTO);
         } catch (BadRequest err) {
             sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, err.getMessage());
         } catch (DuplicateEntityException err) {
@@ -68,6 +71,6 @@ public class CurrenciesServlet extends HttpServlet {
 
     private void sendErrorResponse(HttpServletResponse resp, int statusCode, String messageInternalServerError) throws IOException {
         resp.setStatus(statusCode);
-        objectMapper.writeValue(resp.getWriter(), new ErrorResponse(messageInternalServerError));
+        objectMapper.writeValue(resp.getWriter(), new ErrorDTO(messageInternalServerError));
     }
 }

@@ -3,9 +3,9 @@ package com.will.currency.exchange.api.servlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.will.currency.exchange.api.exception.DuplicateEntityException;
 import com.will.currency.exchange.api.exception.NoSuchEntityException;
-import com.will.currency.exchange.api.response.CurrencyResponse;
-import com.will.currency.exchange.api.response.ErrorResponse;
-import com.will.currency.exchange.api.response.ExchangeRateResponse;
+import com.will.currency.exchange.api.response.CurrencyDTO;
+import com.will.currency.exchange.api.response.ErrorDTO;
+import com.will.currency.exchange.api.response.ExchangeRateDTO;
 import com.will.currency.exchange.api.service.CurrencyService;
 import com.will.currency.exchange.api.service.ExchangeRateService;
 import com.will.currency.exchange.api.util.Validation;
@@ -34,7 +34,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            List<ExchangeRateResponse> exchangeRates = exchangeRateService.findAll();
+            List<ExchangeRateDTO> exchangeRates = exchangeRateService.findAll();
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getWriter(), exchangeRates);
         } catch (SQLException err) {
@@ -50,22 +50,25 @@ public class ExchangeRatesServlet extends HttpServlet {
         try {
             if (!Validation.isValidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, baseCurrencyCode));
+                return;
             }
             if (!Validation.isValidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, targetCurrencyCode));
+                return;
             }
             if (!Validation.isValidRate(rateStr)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, rateStr));
+                return;
             }
             baseCurrencyCode = baseCurrencyCode.toUpperCase();
             targetCurrencyCode = targetCurrencyCode.toUpperCase();
             BigDecimal rate = new BigDecimal(rateStr);
 
-            CurrencyResponse baseCurrency = currencyService.findByCurrencyCode(baseCurrencyCode);
-            CurrencyResponse targetCurrency = currencyService.findByCurrencyCode(targetCurrencyCode);
-            ExchangeRateResponse exchangeRate = new ExchangeRateResponse(baseCurrency, targetCurrency, rate);
+            CurrencyDTO baseCurrency = currencyService.findByCurrencyCode(baseCurrencyCode);
+            CurrencyDTO targetCurrency = currencyService.findByCurrencyCode(targetCurrencyCode);
+            ExchangeRateDTO exchangeRate = new ExchangeRateDTO(baseCurrency, targetCurrency, rate);
 
-            ExchangeRateResponse savedExchangeRate = exchangeRateService.save(exchangeRate);
+            ExchangeRateDTO savedExchangeRate = exchangeRateService.save(exchangeRate);
             resp.setStatus(HttpServletResponse.SC_OK);
             objectMapper.writeValue(resp.getWriter(), savedExchangeRate);
 
@@ -80,6 +83,6 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     private void sendErrorResponse(HttpServletResponse resp, int statusCode, String err) throws IOException {
         resp.setStatus(statusCode);
-        objectMapper.writeValue(resp.getWriter(), new ErrorResponse(err));
+        objectMapper.writeValue(resp.getWriter(), new ErrorDTO(err));
     }
 }

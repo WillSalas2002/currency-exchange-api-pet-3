@@ -11,13 +11,13 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class CurrencyResponse {
+public class CurrencyDTO {
     private int id;
     private String code;
     private String fullName;
     private String sign;
 
-    public CurrencyResponse(String code, String fullName, String sign) {
+    public CurrencyDTO(String code, String fullName, String sign) {
         this.code = code;
         this.fullName = fullName;
         this.sign = sign;

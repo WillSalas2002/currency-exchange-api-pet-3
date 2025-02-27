@@ -3,8 +3,8 @@ package com.will.currency.exchange.api.service;
 import com.will.currency.exchange.api.model.Currency;
 import com.will.currency.exchange.api.model.ExchangeRate;
 import com.will.currency.exchange.api.repository.ExchangeRateRepository;
-import com.will.currency.exchange.api.response.CurrencyResponse;
-import com.will.currency.exchange.api.response.ExchangeResponse;
+import com.will.currency.exchange.api.response.CurrencyDTO;
+import com.will.currency.exchange.api.response.ExchangeDTO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,7 +14,7 @@ import java.util.Optional;
 public class ExchangeService {
     private final ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository();
 
-    public Optional<ExchangeResponse> exchange(CurrencyResponse baseCurrency, CurrencyResponse targetCurrency, BigDecimal amount) throws SQLException {
+    public Optional<ExchangeDTO> exchange(CurrencyDTO baseCurrency, CurrencyDTO targetCurrency, BigDecimal amount) throws SQLException {
 
         Optional<ExchangeRate> directExchangeRateOptional = buildDirectExchangeRate(baseCurrency, targetCurrency);
         if (directExchangeRateOptional.isPresent()) {
@@ -34,15 +34,15 @@ public class ExchangeService {
         return Optional.empty();
     }
 
-    private Optional<ExchangeRate> buildDirectExchangeRate(CurrencyResponse baseCurrency, CurrencyResponse targetCurrency) throws SQLException {
+    private Optional<ExchangeRate> buildDirectExchangeRate(CurrencyDTO baseCurrency, CurrencyDTO targetCurrency) throws SQLException {
         return exchangeRateRepository.findByCurrencyCodes(baseCurrency.getCode(), targetCurrency.getCode());
     }
 
-    private Optional<ExchangeRate> buildReversedExchangeRate(CurrencyResponse baseCurrency, CurrencyResponse targetCurrency) throws SQLException {
+    private Optional<ExchangeRate> buildReversedExchangeRate(CurrencyDTO baseCurrency, CurrencyDTO targetCurrency) throws SQLException {
         return exchangeRateRepository.findByCurrencyCodes(targetCurrency.getCode(), baseCurrency.getCode());
     }
 
-    private Optional<ExchangeRate> buildExchangeRateUsingUSD(CurrencyResponse baseCurrency, CurrencyResponse targetCurrency) throws SQLException {
+    private Optional<ExchangeRate> buildExchangeRateUsingUSD(CurrencyDTO baseCurrency, CurrencyDTO targetCurrency) throws SQLException {
         final String USD_CODE = "USD";
         Optional<ExchangeRate> baseToUsdRate = exchangeRateRepository.findByCurrencyCodes(USD_CODE, baseCurrency.getCode());
         Optional<ExchangeRate> targetToUsdRate = exchangeRateRepository.findByCurrencyCodes(USD_CODE, targetCurrency.getCode());
@@ -54,15 +54,15 @@ public class ExchangeService {
         return Optional.empty();
     }
 
-    private ExchangeResponse calculateReversedExchangeAmount(ExchangeRate reversedExchangeRate, BigDecimal amount) {
+    private ExchangeDTO calculateReversedExchangeAmount(ExchangeRate reversedExchangeRate, BigDecimal amount) {
         BigDecimal reversedRate = BigDecimal.ONE.divide(reversedExchangeRate.getRate(), 4, RoundingMode.HALF_EVEN);
         ExchangeRate exchangeRate = buildExchangeRate(reversedExchangeRate.getTargetCurrency(), reversedExchangeRate.getBaseCurrency(), reversedRate);
         return calculateExchangeAmount(exchangeRate, amount);
     }
 
-    private ExchangeResponse calculateExchangeAmount(ExchangeRate exchangeRate, BigDecimal amount) {
+    private ExchangeDTO calculateExchangeAmount(ExchangeRate exchangeRate, BigDecimal amount) {
         BigDecimal convertedAmount = exchangeRate.getRate().multiply(amount).setScale(2, RoundingMode.HALF_EVEN);
-        return new ExchangeResponse(exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency(), exchangeRate.getRate(), amount, convertedAmount);
+        return new ExchangeDTO(exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency(), exchangeRate.getRate(), amount, convertedAmount);
     }
 
     private ExchangeRate buildExchangeRate(Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {

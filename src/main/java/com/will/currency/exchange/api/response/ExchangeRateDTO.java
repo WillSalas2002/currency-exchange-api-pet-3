@@ -13,13 +13,13 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @ToString
-public class ExchangeRateResponse {
+public class ExchangeRateDTO {
     private int id;
-    private CurrencyResponse baseCurrency;
-    private CurrencyResponse targetCurrency;
+    private CurrencyDTO baseCurrency;
+    private CurrencyDTO targetCurrency;
     private BigDecimal rate;
 
-    public ExchangeRateResponse(CurrencyResponse baseCurrency, CurrencyResponse targetCurrency, BigDecimal rate) {
+    public ExchangeRateDTO(CurrencyDTO baseCurrency, CurrencyDTO targetCurrency, BigDecimal rate) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
         this.rate = rate;

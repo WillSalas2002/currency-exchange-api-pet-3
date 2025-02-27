@@ -3,9 +3,9 @@ package com.will.currency.exchange.api.servlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.will.currency.exchange.api.exception.BadRequest;
 import com.will.currency.exchange.api.exception.NoSuchEntityException;
-import com.will.currency.exchange.api.response.CurrencyResponse;
-import com.will.currency.exchange.api.response.ErrorResponse;
-import com.will.currency.exchange.api.response.ExchangeResponse;
+import com.will.currency.exchange.api.response.CurrencyDTO;
+import com.will.currency.exchange.api.response.ErrorDTO;
+import com.will.currency.exchange.api.response.ExchangeDTO;
 import com.will.currency.exchange.api.service.CurrencyService;
 import com.will.currency.exchange.api.service.ExchangeService;
 import com.will.currency.exchange.api.util.Validation;
@@ -40,17 +40,20 @@ public class ExchangeServlet extends HttpServlet {
         try {
             if (!Validation.isValidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, baseCurrencyCode));
+                return;
             }
             if (!Validation.isValidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, targetCurrencyCode));
+                return;
             }
             if (!Validation.isValidRate(amountStr)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, amountStr));
+                return;
             }
-            CurrencyResponse baseCurrency = currencyService.findByCurrencyCode(baseCurrencyCode);
-            CurrencyResponse targetCurrency = currencyService.findByCurrencyCode(targetCurrencyCode);
+            CurrencyDTO baseCurrency = currencyService.findByCurrencyCode(baseCurrencyCode);
+            CurrencyDTO targetCurrency = currencyService.findByCurrencyCode(targetCurrencyCode);
             BigDecimal amount = new BigDecimal(amountStr);
-            Optional<ExchangeResponse> exchangeOptional = exchangeService.exchange(baseCurrency, targetCurrency, amount);
+            Optional<ExchangeDTO> exchangeOptional = exchangeService.exchange(baseCurrency, targetCurrency, amount);
             if (exchangeOptional.isPresent()) {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 objectMapper.writeValue(resp.getWriter(), exchangeOptional.get());
@@ -68,6 +71,6 @@ public class ExchangeServlet extends HttpServlet {
 
     private void sendErrorResponse(HttpServletResponse resp, int statusCode, String messageInternalServerError) throws IOException {
         resp.setStatus(statusCode);
-        objectMapper.writeValue(resp.getWriter(), new ErrorResponse(messageInternalServerError));
+        objectMapper.writeValue(resp.getWriter(), new ErrorDTO(messageInternalServerError));
     }
 }

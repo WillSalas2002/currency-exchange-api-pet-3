@@ -1,7 +1,7 @@
 package com.will.currency.exchange.api.mapper;
 
 import com.will.currency.exchange.api.model.Currency;
-import com.will.currency.exchange.api.response.CurrencyResponse;
+import com.will.currency.exchange.api.response.CurrencyDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -15,11 +15,11 @@ public interface CurrencyMapper {
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "code", target = "code")
-    Currency toEntity(CurrencyResponse currencyResponse);
+    Currency toEntity(CurrencyDTO currencyDTO);
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "code", target = "code")
-    CurrencyResponse toResponse(Currency currency);
+    CurrencyDTO toResponse(Currency currency);
 
-    List<CurrencyResponse> toResponseList(List<Currency> currencies);
+    List<CurrencyDTO> toResponseList(List<Currency> currencies);
 }

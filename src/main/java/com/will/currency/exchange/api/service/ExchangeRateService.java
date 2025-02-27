@@ -4,7 +4,7 @@ import com.will.currency.exchange.api.exception.NoSuchEntityException;
 import com.will.currency.exchange.api.mapper.ExchangeRateMapper;
 import com.will.currency.exchange.api.model.ExchangeRate;
 import com.will.currency.exchange.api.repository.ExchangeRateRepository;
-import com.will.currency.exchange.api.response.ExchangeRateResponse;
+import com.will.currency.exchange.api.response.ExchangeRateDTO;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,26 +14,26 @@ public class ExchangeRateService {
     private final ExchangeRateRepository repository = new ExchangeRateRepository();
     private final ExchangeRateMapper exchangeRateMapper = ExchangeRateMapper.INSTANCE;
 
-    public List<ExchangeRateResponse> findAll() throws SQLException {
+    public List<ExchangeRateDTO> findAll() throws SQLException {
         return exchangeRateMapper.toResponseList(
                 repository.findAll()
         );
     }
 
-    public ExchangeRateResponse save(ExchangeRateResponse exchangeRateResponse) throws SQLException {
-        ExchangeRate exchangeRate = exchangeRateMapper.toEntity(exchangeRateResponse);
+    public ExchangeRateDTO save(ExchangeRateDTO exchangeRateDTO) throws SQLException {
+        ExchangeRate exchangeRate = exchangeRateMapper.toEntity(exchangeRateDTO);
         ExchangeRate savedExchangeRate = repository.save(exchangeRate);
         return exchangeRateMapper.toResponse(savedExchangeRate);
     }
 
-    public ExchangeRateResponse findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) throws SQLException {
+    public ExchangeRateDTO findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) throws SQLException {
         return repository.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode)
                 .map(exchangeRateMapper::toResponse)
                 .orElseThrow(() -> new NoSuchEntityException(MESSAGE_NOT_FOUND));
     }
 
-    public ExchangeRateResponse update(ExchangeRateResponse exchangeRateResponse) throws SQLException {
-        ExchangeRate exchangeRate = exchangeRateMapper.toEntity(exchangeRateResponse);
+    public ExchangeRateDTO update(ExchangeRateDTO exchangeRateDTO) throws SQLException {
+        ExchangeRate exchangeRate = exchangeRateMapper.toEntity(exchangeRateDTO);
         ExchangeRate updatedExchangeRate = repository.update(exchangeRate);
         return exchangeRateMapper.toResponse(updatedExchangeRate);
     }
