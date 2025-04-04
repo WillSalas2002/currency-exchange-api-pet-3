@@ -38,15 +38,15 @@ public class ExchangeServlet extends HttpServlet {
         String amountStr = req.getParameter(PARAM_AMOUNT);
 
         try {
-            if (!Validation.isValidCode(baseCurrencyCode)) {
+            if (Validation.isValidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, baseCurrencyCode));
                 return;
             }
-            if (!Validation.isValidCode(targetCurrencyCode)) {
+            if (Validation.isValidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, targetCurrencyCode));
                 return;
             }
-            if (!Validation.isValidRate(amountStr)) {
+            if (Validation.isValidRate(amountStr)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, amountStr));
                 return;
             }

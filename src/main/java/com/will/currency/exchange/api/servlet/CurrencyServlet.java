@@ -19,15 +19,16 @@ public class CurrencyServlet extends HttpServlet {
     private static final String SYMBOL_FRONT_SLASH = "/";
     private static final String MESSAGE_INVALID_PARAMETER = "Invalid parameter: %s";
     private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
+    private static final String EMPTY_STRING = "";
 
     private final CurrencyService currencyService = new CurrencyService();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String currencyCode = req.getPathInfo().replace(SYMBOL_FRONT_SLASH, "");
-        if (!Validation.isValidCode(currencyCode)) {
-            sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, MESSAGE_INVALID_PARAMETER);
+        String currencyCode = req.getPathInfo().replace(SYMBOL_FRONT_SLASH, EMPTY_STRING);
+        if (Validation.isValidCode(currencyCode)) {
+            sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, currencyCode));
             return;
         }
         try {

@@ -48,15 +48,15 @@ public class ExchangeRatesServlet extends HttpServlet {
         String targetCurrencyCode = req.getParameter(PARAM_TARGET_CURRENCY_CODE);
         String rateStr = req.getParameter(PARAM_RATE);
         try {
-            if (!Validation.isValidCode(baseCurrencyCode)) {
+            if (Validation.isValidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, baseCurrencyCode));
                 return;
             }
-            if (!Validation.isValidCode(targetCurrencyCode)) {
+            if (Validation.isValidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, targetCurrencyCode));
                 return;
             }
-            if (!Validation.isValidRate(rateStr)) {
+            if (Validation.isValidRate(rateStr)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, rateStr));
                 return;
             }

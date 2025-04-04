@@ -48,7 +48,7 @@ public class CurrenciesServlet extends HttpServlet {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, fullName));
                 return;
             }
-            if (!Validation.isValidCode(code)) {
+            if (Validation.isValidCode(code)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, code));
                 return;
             }

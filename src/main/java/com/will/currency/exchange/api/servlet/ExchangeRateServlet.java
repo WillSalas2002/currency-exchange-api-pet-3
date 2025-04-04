@@ -25,6 +25,7 @@ public class ExchangeRateServlet extends HttpServlet {
     private static final String SYMBOL_FRONT_SLASH = "/";
     private static final String MESSAGE_INVALID_PARAMETER = "Invalid parameter: %s";
     private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
+    private static final String EMPTY_STRING = "";
 
     private final ExchangeRateService exchangeRateService = new ExchangeRateService();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -40,16 +41,21 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String pathInfo = req.getPathInfo().replace(SYMBOL_FRONT_SLASH, "");
-        String baseCurrencyCode = pathInfo.substring(0, 3).toUpperCase();
-        String targetCurrencyCode = pathInfo.substring(3).toUpperCase();
 
         try {
-            if (!Validation.isValidCode(baseCurrencyCode)) {
+            String pathInfo = req.getPathInfo().replace(SYMBOL_FRONT_SLASH, EMPTY_STRING);
+            if (Validation.isValidExchangeRatePath(pathInfo)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, pathInfo));
+                return;
+            }
+            String baseCurrencyCode = pathInfo.substring(0, 3).toUpperCase();
+            String targetCurrencyCode = pathInfo.substring(3).toUpperCase();
+
+            if (Validation.isValidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, baseCurrencyCode));
                 return;
             }
-            if (!Validation.isValidCode(targetCurrencyCode)) {
+            if (Validation.isValidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, targetCurrencyCode));
                 return;
             }
@@ -65,21 +71,26 @@ public class ExchangeRateServlet extends HttpServlet {
     }
 
     private void doPatch(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String pathInfo = req.getPathInfo().replace(SYMBOL_FRONT_SLASH, "");
-        String baseCurrencyCode = pathInfo.substring(0, 3);
-        String targetCurrencyCode = pathInfo.substring(3);
-        Optional<String> rateOptional = getRateParameter(req);
         try {
-            if (!Validation.isValidCode(baseCurrencyCode)) {
-                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, baseCurrencyCode);
+            String pathInfo = req.getPathInfo().replace(SYMBOL_FRONT_SLASH, EMPTY_STRING);
+            if (Validation.isValidExchangeRatePath(pathInfo)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, pathInfo));
                 return;
             }
-            if (!Validation.isValidCode(targetCurrencyCode)) {
-                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, targetCurrencyCode);
+            String baseCurrencyCode = pathInfo.substring(0, 3);
+            String targetCurrencyCode = pathInfo.substring(3);
+            Optional<String> rateOptional = getRateParameter(req);
+
+            if (Validation.isValidCode(baseCurrencyCode)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, baseCurrencyCode));
                 return;
             }
-            if (rateOptional.isEmpty() || !Validation.isValidRate(rateOptional.get())) {
-                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, rateOptional.get());
+            if (Validation.isValidCode(targetCurrencyCode)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, targetCurrencyCode));
+                return;
+            }
+            if (rateOptional.isEmpty() || Validation.isValidRate(rateOptional.get())) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, PARAM_RATE));
                 return;
             }
             BigDecimal rate = new BigDecimal(rateOptional.get());

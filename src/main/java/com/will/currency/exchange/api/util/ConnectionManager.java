@@ -15,8 +15,11 @@ import java.util.concurrent.BlockingQueue;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConnectionManager {
-    private static final String POOL_KEY = "db.pool.key";
     private static final int DEFAULT_POOL_SIZE = 10;
+    private static final String POOL_KEY = "db.pool.key";
+    private static final String JDBC_CLASS_NAME = "org.sqlite.JDBC";
+    private static final String JDBC_PREFIX = "jdbc:sqlite:";
+    private static final String DB_NAME = "db.sqlite";
     private static BlockingQueue<Connection> pool;
 
     static {
@@ -49,13 +52,13 @@ public final class ConnectionManager {
     private static Connection open() {
         Connection connection;
         try {
-            URL resource = ConnectionManager.class.getClassLoader().getResource("db.sqlite");
+            URL resource = ConnectionManager.class.getClassLoader().getResource(DB_NAME);
             if (resource == null) {
                 throw new RuntimeException("Database file not found in resources!");
             }
             String absolutePath = new File(resource.toURI()).getAbsolutePath();
-            String url = "jdbc:sqlite:" + absolutePath;
-            Class.forName("org.sqlite.JDBC");
+            String url = JDBC_PREFIX + absolutePath;
+            Class.forName(JDBC_CLASS_NAME);
             connection = DriverManager.getConnection(url);
         } catch (SQLException | ClassNotFoundException | URISyntaxException e) {
             throw new RuntimeException(e);

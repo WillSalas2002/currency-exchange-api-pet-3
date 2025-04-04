@@ -3,7 +3,7 @@ package com.will.currency.exchange.api.util;
 public class Validation {
 
     public static boolean isValidCode(String code) {
-        return code != null && code.matches("[a-zA-Z]{3}");
+        return code == null || !code.matches("[a-zA-Z]{3}");
     }
 
     public static boolean isValidFullName(String fullName) {
@@ -15,6 +15,10 @@ public class Validation {
     }
 
     public static boolean isValidRate(String rate) {
-        return rate != null && rate.matches("^\\d+(\\.\\d+)?$");
+        return rate == null || !rate.matches("^\\d+(\\.\\d+)?$");
+    }
+
+    public static boolean isValidExchangeRatePath(String path) {
+        return path == null || !(path.length() == 6);
     }
 }
