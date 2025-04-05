@@ -22,8 +22,8 @@ import java.util.Optional;
 @WebServlet("/exchange/*")
 public class ExchangeServlet extends HttpServlet {
     private static final String PARAM_AMOUNT = "amount";
-    private static final String PARAM_BASE_CURRENCY_CODE = "baseCurrencyCode";
-    private static final String PARAM_TARGET_CURRENCY_CODE = "targetCurrencyCode";
+    private static final String PARAM_BASE_CURRENCY_CODE = "from";
+    private static final String PARAM_TARGET_CURRENCY_CODE = "to";
     private static final String MESSAGE_INVALID_PARAMETER = "Invalid parameter: %s";
     private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
 
