@@ -1,4 +1,4 @@
-package com.will.currency.exchange.api.service;
+package com.will.currency.exchange.api.service.exchange;
 
 import com.will.currency.exchange.api.model.ExchangeRate;
 import com.will.currency.exchange.api.repository.ExchangeRateRepository;

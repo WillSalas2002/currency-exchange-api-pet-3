@@ -1,4 +1,4 @@
-package com.will.currency.exchange.api.service;
+package com.will.currency.exchange.api.service.exchange;
 
 import com.will.currency.exchange.api.model.ExchangeRate;
 import com.will.currency.exchange.api.repository.ExchangeRateRepository;
@@ -28,6 +28,10 @@ public class ReversedExchangeStrategy extends ExchangeStrategy {
 
     private static ExchangeRate prepareExchangeRate(ExchangeRate exchangeRate) {
         BigDecimal reversedRate = BigDecimal.ONE.divide(exchangeRate.getRate(),4, RoundingMode.HALF_EVEN);
-        return ExchangeRateFactory.buildExchangeRate(exchangeRate.getTargetCurrency(), exchangeRate.getBaseCurrency(), reversedRate);
+        return ExchangeRate.builder()
+                .baseCurrency(exchangeRate.getTargetCurrency())
+                .targetCurrency(exchangeRate.getBaseCurrency())
+                .rate(reversedRate)
+                .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.will.currency.exchange.api.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @ToString
+@Builder
 public class ExchangeRate {
     private Integer id;
     private Currency baseCurrency;

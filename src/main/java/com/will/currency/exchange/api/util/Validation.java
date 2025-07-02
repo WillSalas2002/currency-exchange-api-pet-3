@@ -1,9 +1,17 @@
 package com.will.currency.exchange.api.util;
 
+import java.util.Currency;
+
 public class Validation {
 
     public static boolean isValidCode(String code) {
-        return code == null || !code.matches("[a-zA-Z]{3}");
+        if (code == null) return false;
+        try {
+            Currency.getInstance(code.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public static boolean isValidFullName(String fullName) {

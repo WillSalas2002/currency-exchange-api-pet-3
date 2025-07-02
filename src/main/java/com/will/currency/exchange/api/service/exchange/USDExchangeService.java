@@ -1,4 +1,4 @@
-package com.will.currency.exchange.api.service;
+package com.will.currency.exchange.api.service.exchange;
 
 import com.will.currency.exchange.api.model.ExchangeRate;
 import com.will.currency.exchange.api.repository.ExchangeRateRepository;
@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.Optional;
-
-import static com.will.currency.exchange.api.service.ExchangeRateFactory.buildExchangeRate;
 
 public class USDExchangeService extends ExchangeStrategy {
 
@@ -34,6 +32,10 @@ public class USDExchangeService extends ExchangeStrategy {
 
     private static ExchangeRate prepareExchangeRate(ExchangeRate targetExchangeRate, ExchangeRate baseExchangeRate) {
         BigDecimal rateWithUSDBase = targetExchangeRate.getRate().divide(baseExchangeRate.getRate(), 2, RoundingMode.HALF_EVEN);
-        return buildExchangeRate(baseExchangeRate.getBaseCurrency(), targetExchangeRate.getTargetCurrency(), rateWithUSDBase);
+        return ExchangeRate.builder()
+                .baseCurrency(baseExchangeRate.getBaseCurrency())
+                .targetCurrency(targetExchangeRate.getTargetCurrency())
+                .rate(rateWithUSDBase)
+                .build();
     }
 }

@@ -7,7 +7,7 @@ import com.will.currency.exchange.api.response.CurrencyDTO;
 import com.will.currency.exchange.api.response.ErrorDTO;
 import com.will.currency.exchange.api.response.ExchangeDTO;
 import com.will.currency.exchange.api.service.CurrencyService;
-import com.will.currency.exchange.api.service.ExchangeStrategyService;
+import com.will.currency.exchange.api.service.exchange.ExchangeStrategyService;
 import com.will.currency.exchange.api.util.Validation;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
