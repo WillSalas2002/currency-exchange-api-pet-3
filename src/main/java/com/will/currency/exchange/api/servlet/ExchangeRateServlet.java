@@ -24,6 +24,7 @@ public class ExchangeRateServlet extends HttpServlet {
     private static final String METHOD_PATCH = "PATCH";
     private static final String SYMBOL_FRONT_SLASH = "/";
     private static final String MESSAGE_INVALID_PARAMETER = "Invalid parameter: %s";
+    private static final String MESSAGE_INVALID_CURRENCY_CODE = "No such currency: %s";
     private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
     private static final String EMPTY_STRING = "";
 
@@ -51,12 +52,12 @@ public class ExchangeRateServlet extends HttpServlet {
             String baseCurrencyCode = pathInfo.substring(0, 3).toUpperCase();
             String targetCurrencyCode = pathInfo.substring(3).toUpperCase();
 
-            if (Validation.isValidCode(baseCurrencyCode)) {
-                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, baseCurrencyCode));
+            if (Validation.isInvalidCode(baseCurrencyCode)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_CURRENCY_CODE, baseCurrencyCode));
                 return;
             }
-            if (Validation.isValidCode(targetCurrencyCode)) {
-                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, targetCurrencyCode));
+            if (Validation.isInvalidCode(targetCurrencyCode)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_CURRENCY_CODE, targetCurrencyCode));
                 return;
             }
             ExchangeRateDTO exchangeRateDTO = exchangeRateService.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
@@ -81,15 +82,15 @@ public class ExchangeRateServlet extends HttpServlet {
             String targetCurrencyCode = pathInfo.substring(3);
             Optional<String> rateOptional = getRateParameter(req);
 
-            if (Validation.isValidCode(baseCurrencyCode)) {
+            if (Validation.isInvalidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, baseCurrencyCode));
                 return;
             }
-            if (Validation.isValidCode(targetCurrencyCode)) {
+            if (Validation.isInvalidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, targetCurrencyCode));
                 return;
             }
-            if (rateOptional.isEmpty() || Validation.isValidRate(rateOptional.get())) {
+            if (rateOptional.isEmpty() || Validation.isInvalidRate(rateOptional.get())) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, PARAM_RATE));
                 return;
             }

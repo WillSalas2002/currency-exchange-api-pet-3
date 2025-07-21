@@ -19,10 +19,11 @@ import java.util.List;
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
     private static final String MESSAGE_INVALID_PARAMETER = "Invalid parameter: %s";
+    private static final String MESSAGE_INVALID_CURRENCY_CODE = "No such currency: %s";
     private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later.";
-    public static final String PARAM_FULL_NAME = "fullName";
-    public static final String PARAM_CODE = "code";
-    public static final String PARAM_SIGN = "sign";
+    private static final String PARAM_FULL_NAME = "name";
+    private static final String PARAM_CODE = "code";
+    private static final String PARAM_SIGN = "sign";
 
     private final CurrencyService currencyService = new CurrencyService();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -48,8 +49,8 @@ public class CurrenciesServlet extends HttpServlet {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, fullName));
                 return;
             }
-            if (!Validation.isValidCode(code)) {
-                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAMETER, code));
+            if (Validation.isInvalidCode(code)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_CURRENCY_CODE, code));
                 return;
             }
             if (!Validation.isValidSign(sign)) {

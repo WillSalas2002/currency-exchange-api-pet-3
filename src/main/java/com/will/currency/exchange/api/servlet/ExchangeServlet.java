@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.Optional;
 
 @WebServlet("/exchange/*")
@@ -24,7 +25,9 @@ public class ExchangeServlet extends HttpServlet {
     private static final String PARAM_AMOUNT = "amount";
     private static final String PARAM_BASE_CURRENCY_CODE = "from";
     private static final String PARAM_TARGET_CURRENCY_CODE = "to";
-    private static final String MESSAGE_INVALID_PARAMETER = "Invalid parameter: %s";
+    private static final String MESSAGE_INVALID_AMOUNT = "Invalid amount: \"%s\"";
+    private static final String MESSAGE_INVALID_CURRENCY_CODE = "No such currency: %s";
+    private static final String MESSAGE_SAME_CURRENCY_CODES = "Currency codes cannot be the same: %s";
     private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
 
     private final ExchangeStrategyService exchangeService = new ExchangeStrategyService();
@@ -38,16 +41,20 @@ public class ExchangeServlet extends HttpServlet {
         String amountStr = req.getParameter(PARAM_AMOUNT);
 
         try {
-            if (Validation.isValidCode(baseCurrencyCode)) {
-                sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, baseCurrencyCode));
+            if (Validation.isInvalidCode(baseCurrencyCode)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_CURRENCY_CODE, baseCurrencyCode));
                 return;
             }
-            if (Validation.isValidCode(targetCurrencyCode)) {
-                sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, targetCurrencyCode));
+            if (Validation.isInvalidCode(targetCurrencyCode)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_CURRENCY_CODE, targetCurrencyCode));
                 return;
             }
-            if (Validation.isValidRate(amountStr)) {
-                sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, String.format(MESSAGE_INVALID_PARAMETER, amountStr));
+            if (Objects.equals(baseCurrencyCode, targetCurrencyCode)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_SAME_CURRENCY_CODES, baseCurrencyCode));
+                return;
+            }
+            if (Validation.isInvalidRate(amountStr)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_AMOUNT, amountStr));
                 return;
             }
             CurrencyDTO baseCurrency = currencyService.findByCurrencyCode(baseCurrencyCode);

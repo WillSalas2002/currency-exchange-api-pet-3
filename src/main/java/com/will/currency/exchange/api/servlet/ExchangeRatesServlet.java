@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
@@ -25,6 +26,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     private static final String PARAM_BASE_CURRENCY_CODE = "baseCurrencyCode";
     private static final String PARAM_TARGET_CURRENCY_CODE = "targetCurrencyCode";
     private static final String MESSAGE_INVALID_PARAM = "Invalid parameter: %s";
+    private static final String MESSAGE_SAME_CURRENCY_CODES = "Currency codes cannot be the same: %s";
     private static final String MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error. Try again later";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -48,15 +50,19 @@ public class ExchangeRatesServlet extends HttpServlet {
         String targetCurrencyCode = req.getParameter(PARAM_TARGET_CURRENCY_CODE);
         String rateStr = req.getParameter(PARAM_RATE);
         try {
-            if (Validation.isValidCode(baseCurrencyCode)) {
+            if (Validation.isInvalidCode(baseCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, baseCurrencyCode));
                 return;
             }
-            if (Validation.isValidCode(targetCurrencyCode)) {
+            if (Validation.isInvalidCode(targetCurrencyCode)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, targetCurrencyCode));
                 return;
             }
-            if (Validation.isValidRate(rateStr)) {
+            if (Objects.equals(baseCurrencyCode, targetCurrencyCode)) {
+                sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_SAME_CURRENCY_CODES, baseCurrencyCode));
+                return;
+            }
+            if (Validation.isInvalidRate(rateStr)) {
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, String.format(MESSAGE_INVALID_PARAM, rateStr));
                 return;
             }

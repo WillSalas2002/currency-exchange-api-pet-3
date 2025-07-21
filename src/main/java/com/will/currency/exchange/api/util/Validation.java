@@ -1,16 +1,35 @@
 package com.will.currency.exchange.api.util;
 
-import java.util.Currency;
+import lombok.experimental.UtilityClass;
 
+import java.util.Currency;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+
+@UtilityClass
 public class Validation {
 
-    public static boolean isValidCode(String code) {
-        if (code == null) return false;
+    private static final Set<String> VALID_CURRENCY_SYMBOLS = new HashSet<>();
+
+    static {
+        for (Locale locale : Locale.getAvailableLocales()) {
+            try {
+                Currency currency = Currency.getInstance(locale);
+                VALID_CURRENCY_SYMBOLS.add(currency.getSymbol(locale));
+            } catch (Exception ignored) {
+                // Some locales don't have a currency
+            }
+        }
+    }
+
+    public static boolean isInvalidCode(String code) {
+        if (code == null) return true;
         try {
             Currency.getInstance(code.toUpperCase());
-            return true;
-        } catch (IllegalArgumentException e) {
             return false;
+        } catch (IllegalArgumentException e) {
+            return true;
         }
     }
 
@@ -19,14 +38,14 @@ public class Validation {
     }
 
     public static boolean isValidSign(String sign) {
-        return sign != null && sign.length() == 1;
+        return VALID_CURRENCY_SYMBOLS.contains(sign);
     }
 
-    public static boolean isValidRate(String rate) {
+    public static boolean isInvalidRate(String rate) {
         return rate == null || !rate.matches("^\\d+(\\.\\d+)?$");
     }
 
     public static boolean isValidExchangeRatePath(String path) {
-        return path == null || !(path.length() == 6);
+        return path == null || path.length() != 6;
     }
 }

@@ -13,11 +13,11 @@ import java.util.Optional;
 public abstract class ExchangeStrategy {
     protected final ExchangeRateRepository exchangeRateRepository;
 
-    public ExchangeStrategy(ExchangeRateRepository exchangeRateRepository) {
+    protected ExchangeStrategy(ExchangeRateRepository exchangeRateRepository) {
         this.exchangeRateRepository = exchangeRateRepository;
     }
 
-    public abstract Optional<ExchangeDTO> exchange(CurrencyDTO baseCurrency, CurrencyDTO targetCurrency, BigDecimal amount) throws SQLException;
+    protected abstract Optional<ExchangeDTO> exchange(CurrencyDTO baseCurrency, CurrencyDTO targetCurrency, BigDecimal amount) throws SQLException;
 
     protected ExchangeDTO calculateExchangeAmount(ExchangeRate exchangeRate, BigDecimal amount) {
         BigDecimal convertedAmount = exchangeRate.getRate().multiply(amount).setScale(2, RoundingMode.HALF_EVEN);

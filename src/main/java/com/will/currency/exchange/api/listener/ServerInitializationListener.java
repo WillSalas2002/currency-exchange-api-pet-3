@@ -49,7 +49,7 @@ public class ServerInitializationListener implements ServletContextListener {
 
     private static String getFileAbsolutePath(String sqlFile) {
         try {
-            URL resource = ConnectionManager.class.getClassLoader().getResource(sqlFile);
+            URL resource = ServerInitializationListener.class.getClassLoader().getResource(sqlFile);
             if (resource == null) {
                 throw new RuntimeException("SQL file not found in resources!");
             }
@@ -65,7 +65,6 @@ public class ServerInitializationListener implements ServletContextListener {
             StringBuilder sb = new StringBuilder();
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
-
             }
             return sb.toString();
         } catch (IOException e) {
